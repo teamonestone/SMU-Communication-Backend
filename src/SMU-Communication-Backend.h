@@ -22,18 +22,95 @@
 #include <inttypes.h>
 #include <Arduino.h>
 
-class SMU_Com_Backend
+/**
+ * @namespace SMU_Com_Backend
+ * 
+ * @brief Namespace for SMU-Communication-Backend related stuff.
+ */
+namespace SMU_Com_Backend
 {
-// Begin PUBLIC ------------------------------------------------------------------
-	public:
-		uint8_t getChecksum(uint8_t* dataArray, uint8_t lenght);
+	///////////
+	// enums //
+	///////////
 
-// End PUBLIC --------------------------------------------------------------------
+	/**
+	 * @enum MessageType
+	 * 
+	 * @brief Enum that represents the differnet Messages Types for the serial communication.
+	 */ 
+	enum MessageType {
+		ACK_FAULT = 0x00,
+		ACK = 0x01,
+		PING = 0x02,
+		GET_STATUS = 0x03,
+		GET_ERROR = 0x04,
+		RESET = 0x05,
 
-// Begin PRIVATE -----------------------------------------------------------------
-	private:
+		INIT_SENSOR = 0x1e,
+		SET_ACTIVE = 0x1f,
 
-// End PRIVATE -------------------------------------------------------------------
+		AUTO_UPDATE = 0x46,
+		MAN_UPDATE = 0x47
+	};
+
+	/////////////
+	// classes //
+	/////////////
+
+	/**
+	 * @class Message
+	 * 
+	 * @brief Represents a serial for or from the SMU.
+	 */
+	class Message {
+		// Begin PUBLIC ------------------------------------------------------------------
+		public:
+
+			// Constructors
+
+			Message();
+			Message(MessageType msgType);
+			Message(MessageType msgType, uint8_t* payload, uint8_t payloadSize);
+
+			
+			// Setter
+
+			void setMsgType(MessageType msgType);
+			void setPayload(uint8_t* payload, uint8_t payloadSize);
+
+
+			// Getters
+
+			MessageType getMsgType();
+
+			uint8_t* getPayload();
+			uint8_t getPayloadSize();
+
+			uint8_t getTotalSize();
+			uint8_t getChecksum();
+
+
+		// End PUBLIC --------------------------------------------------------------------
+
+		// Begin PRIVATE -----------------------------------------------------------------
+		private:
+			MessageType _MsgType;
+
+			uint8_t* _payload;
+			uint8_t _payloadSize; 
+
+			uint8_t _checksum;
+			uint8_t _totalSize;
+
+		// End PRIVATE -------------------------------------------------------------------
+	};
+
+	///////////////
+	// functions //
+	///////////////
+
+	bool checkChecksum(Message* msg);
+
 };
 
 #endif
