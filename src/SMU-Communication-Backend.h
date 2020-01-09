@@ -20,7 +20,7 @@
 
 // basic Includes
 #include <inttypes.h>
-#include <Arduino.h>
+#include "Arduino.h"
 
 
 /////////////
@@ -59,7 +59,7 @@ namespace SMU_Com_Backend
 		ACK_FAULT = 0x01,
 		ACK = 0x02,
 
-		PING = 0x03,
+		PONG = 0x03,
 		GET_STATUS = 0x04,
 		GET_ERROR = 0x05,
 		RESET = 0x06,
@@ -120,7 +120,8 @@ namespace SMU_Com_Backend
 
 			uint8_t _checksum;
 
-			void _genChecksum();
+			void _setChecksum();
+			void _setPayloadZero();
 
 		// End PRIVATE -------------------------------------------------------------------
 	};
@@ -130,19 +131,24 @@ namespace SMU_Com_Backend
 	// variables //
 	///////////////
 
-	uint16_t serialComTimeout = 50;
+	static uint16_t serialComTimeout = 50;
+	static HardwareSerial serialInterface = Serial1;
 
 
 	///////////////
 	// functions //
 	///////////////
 
+	uint8_t genCheckSum(MessageType msgType, uint8_t payloadSize, uint8_t payload[25]);
+
 	bool checkChecksum(Message* msg);
+	bool checkChecksum(Message* msg, uint8_t checksum);
+	bool checkChecksum(MessageType msgType, uint8_t payloadSize, uint8_t payload[25], uint8_t checksum);
 
-	void sendMessage(void* SerialComObj, Message* msg);
+	void sendMessage(Message* msg);
 
-	bool readNextMessage(void* SerialComObj, Message* msg);
+	bool readNextMessage(Message* msg);
 
-};
+}
 
 #endif
