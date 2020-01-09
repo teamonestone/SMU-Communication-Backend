@@ -39,12 +39,15 @@ namespace SMU_Com_Backend
 	 * @brief Enum that represents the differnet Messages Types for the serial communication.
 	 */ 
 	enum MessageType {
-		ACK_FAULT = 0x00,
-		ACK = 0x01,
-		PING = 0x02,
-		GET_STATUS = 0x03,
-		GET_ERROR = 0x04,
-		RESET = 0x05,
+		NONE = 0x00,
+
+		ACK_FAULT = 0x01,
+		ACK = 0x02,
+
+		PING = 0x03,
+		GET_STATUS = 0x04,
+		GET_ERROR = 0x05,
+		RESET = 0x06,
 
 		INIT_SENSOR = 0x1e,
 		SET_ACTIVE = 0x1f,
@@ -76,7 +79,7 @@ namespace SMU_Com_Backend
 			// Setter
 
 			void setMsgType(MessageType msgType);
-			void setPayload(uint8_t* payload, uint8_t payloadSize);
+			bool setPayload(uint8_t* payload, uint8_t payloadSize);
 
 
 			// Getters
@@ -101,6 +104,8 @@ namespace SMU_Com_Backend
 
 			uint8_t _checksum;
 			uint8_t _totalSize;
+
+			void _genChecksum();
 
 		// End PRIVATE -------------------------------------------------------------------
 	};
