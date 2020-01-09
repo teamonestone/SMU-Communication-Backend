@@ -6,10 +6,10 @@ The Communication Backend for the [Universal-I2C-Sensor-Master-Unit](https://git
 All serial messages used to controll the SMU board follow the following format: 
 
 ```
-|-----------------|-------------|-----------------------|----------|-----------------|
-| '~' as Preambel | MessageType | 0 - 251 Bytes of Data | Checksum | '#' as End-Sign |
-|      1 Char     |   1 Byte    |     0 - 251 Bytes     |  1 Byte  |      1 Char     |
-|-----------------|-------------|-----------------------|----------|-----------------|
+|-----------------|-------------|-------------|----------------------|----------|-----------------|
+| '~' as Preambel | MessageType | PayloadSize | 0 - 25 Bytes of Data | Checksum | '#' as End-Sign |
+|      1 Char     |   1 Byte    |    1 Byte   |     0 - 25 Bytes     |  1 Byte  |      1 Char     |
+|-----------------|-------------|-------------|----------------------|----------|-----------------|
 ```
 ## MessageType
 
@@ -17,7 +17,7 @@ All serial messages used to controll the SMU board follow the following format:
 |----------|----------|---------------|----------------------------------------------------------|-----------------------------------------------------------|
 | 0        | 0x00     | `NONE`        | -                                                        | Empty message                                             |
 | 1        | 0x01     | `ACK_FAULT`   | 8-bit message-type of last rec message + error code      | Indicates a coomunication error                           |
-| 2        | 0x02     | `ACK`         | 8-bit message-type that is been acknowledged + payload   | ACK + payload send back (can be up to 250 bytes)          | 
+| 2        | 0x02     | `ACK`         | 8-bit message-type that is been acknowledged + payload   | ACK + payload send back (can be up to 24 bytes)           | 
 | 3        | 0x03     | `PING`        | 8-bit random value                                       | Ping Request                                              |
 | 4        | 0x04     | `GET_STATUS`  | 8-bit status code                                        | Get the current system stauts code from the SMU           |
 | 5        | 0x05     | `GET_ERROR`   | 8-bit error code                                         | Get the current system error code from the SMU            |

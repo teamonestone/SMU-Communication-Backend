@@ -1,0 +1,46 @@
+#######################################
+# Syntax Coloring Map For ExampleLibrary
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+SMU_Com_Backend	KEYWORD1
+MessageType	KEYWORD1
+Message	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+Message	KEYWORD2
+
+setMsgType	KEYWORD2
+setPayload	KEYWORD2
+setChecksum	KEYWORD2
+
+getMsgType	KEYWORD2
+getPayload	KEYWORD2
+getPayloadSize	KEYWORD2
+getTotalSize	KEYWORD2
+getChecksum	KEYWORD2
+
+checkChecksum	KEYWORD2
+sendMessage	KEYWORD2
+readNextMessage	KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+serialComTimeout	LITERAL1
+
+_SMU_COM_BACKEND_PREAMBEL_SING	LITERAL1
+_SMU_COM_BACKEND_END_SING	LITERAL1
+_SMU_COM_BACKEND_MAX_PAYLOAD_SIZE	LITERAL1
+_SMU_COM_BACKEND_TOTAL_SIZE_OFFSET	LITERAL1

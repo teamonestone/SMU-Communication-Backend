@@ -22,6 +22,21 @@
 #include <inttypes.h>
 #include <Arduino.h>
 
+
+/////////////
+// Defines //
+/////////////
+
+#define _SMU_COM_BACKEND_PREAMBEL_SING '~'
+#define _SMU_COM_BACKEND_END_SING '#'
+#define _SMU_COM_BACKEND_MAX_PAYLOAD_SIZE 25
+#define _SMU_COM_BACKEND_TOTAL_SIZE_OFFSET 3
+
+
+/////////////
+// Members //
+/////////////
+
 /**
  * @namespace SMU_Com_Backend
  * 
@@ -38,7 +53,7 @@ namespace SMU_Com_Backend
 	 * 
 	 * @brief Enum that represents the differnet Messages Types for the serial communication.
 	 */ 
-	enum MessageType {
+	enum MessageType : int16_t {
 		NONE = 0x00,
 
 		ACK_FAULT = 0x01,
@@ -73,13 +88,14 @@ namespace SMU_Com_Backend
 
 			Message();
 			Message(MessageType msgType);
-			Message(MessageType msgType, uint8_t* payload, uint8_t payloadSize);
+			Message(MessageType msgType, uint8_t payload[_SMU_COM_BACKEND_MAX_PAYLOAD_SIZE], uint8_t payloadSize);
+			~Message();
 
 			
 			// Setter
-
 			void setMsgType(MessageType msgType);
-			bool setPayload(uint8_t* payload, uint8_t payloadSize);
+			bool setPayload(uint8_t payload[_SMU_COM_BACKEND_MAX_PAYLOAD_SIZE], uint8_t payloadSize);
+			void setChecksum(uint8_t checksum);
 
 
 			// Getters
@@ -99,16 +115,23 @@ namespace SMU_Com_Backend
 		private:
 			MessageType _MsgType;
 
-			uint8_t* _payload;
+			uint8_t _payload[_SMU_COM_BACKEND_MAX_PAYLOAD_SIZE];
 			uint8_t _payloadSize; 
 
 			uint8_t _checksum;
-			uint8_t _totalSize;
 
 			void _genChecksum();
 
 		// End PRIVATE -------------------------------------------------------------------
 	};
+
+
+	///////////////
+	// variables //
+	///////////////
+
+	uint16_t serialComTimeout = 50;
+
 
 	///////////////
 	// functions //
@@ -117,6 +140,8 @@ namespace SMU_Com_Backend
 	bool checkChecksum(Message* msg);
 
 	void sendMessage(void* SerialComObj, Message* msg);
+
+	bool readNextMessage(void* SerialComObj, Message* msg);
 
 };
 

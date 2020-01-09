@@ -16,33 +16,46 @@
 
 using namespace SMU_Com_Backend;
 
+///////////////////////
+// class construcots //
+///////////////////////
+
 Message::Message() {
     _MsgType = MessageType::NONE;
-    _payload = nullptr;
+    _payload = {0};
     _payloadSize = 0;
-    _totalSize = 0;
 
     _checksum = 0;
 }
 
 Message::Message(MessageType msgType) {
     _MsgType = msgType;
-    _payload = nullptr;
+    _payload = {0};
     _payloadSize = 0;
-    _totalSize = 2;
 
     _genChecksum();
 }
 
-Message::Message(MessageType msgType, uint8_t* payload, uint8_t payloadSize) {
+Message::Message(MessageType msgType, uint8_t payload[_SMU_COM_BACKEND_MAX_PAYLOAD_SIZE], uint8_t payloadSize) {
     _MsgType = msgType;
-    _payload = payload;
+    _payload = {0};
     _payloadSize = payloadSize;
-    _totalSize = _payloadSize + 2;
+
+    // copy payload
+    for (uint8_t i = 0; i < _payloadSize; i++) {
+        _payload[i] = payload[i];
+    }
 
     _genChecksum();
 }
 
+~Message::Message(){
+    
+}
+
+/////////////////////
+// class functions //
+/////////////////////
 
 void Message::setMsgType(MessageType msgType) {
     _MsgType = msgType;
@@ -51,15 +64,18 @@ void Message::setMsgType(MessageType msgType) {
     _genChecksum();
 }
 
-bool Message::setPayload(uint8_t* payload, uint8_t payloadSize) {
+bool Message::setPayload(uint8_t payload[_SMU_COM_BACKEND_MAX_PAYLOAD_SIZE], uint8_t payloadSize) {
     // payload size check
-    if (payloadSize > 250) {
+    if (payloadSize > _SMU_COM_BACKEND_MAX_PAYLOAD_SIZE) {
         return false;
     }
 
-    _payload = payload;
     _payloadSize = _payloadSize;
-    _totalSize = _payloadSize + 2;
+
+    // copy payload
+    for (uint8_t i = 0; i < _payloadSize; i++) {
+        _payload[i] = payload[i];
+    }
 
     // update checksum
     _genChecksum();
@@ -67,6 +83,9 @@ bool Message::setPayload(uint8_t* payload, uint8_t payloadSize) {
     return true;
 }
 
+void Message::setChecksum(uint8_t checksum) {
+    _checksum = checksum;
+}
 
 MessageType Message::getMsgType() {
     return _MsgType;
@@ -81,28 +100,30 @@ uint8_t Message::getPayloadSize() {
 }
 
 uint8_t Message::getTotalSize() {
-    return _totalSize;
+    return _payloadSize + _SMU_COM_BACKEND_TOTAL_SIZE_OFFSET;
 }
 
 uint8_t Message::getChecksum() {
     return _checksum;
 }
 
-
 void Message::_genChecksum() {
-    uint32_t tempSum = 0; 
+    uint16_t tempSum = 0; 
 
     // add MsgType to checksum
-    tempSum += static_cast<int>(_MsgType);
+    tempSum += static_cast<int16_t>(getMsgType());
+
+    // add payload size to checksum
+    tempSum += static_cast<int16_t>(getPayloadSize());
 
     // add payload to checksum
-    for (uint8_t i = 0; i < _payloadSize; i++) {        
-        tempSum += static_cast<int>(_payload[i]);
+    for (uint8_t i = 0; i < getPayloadSize(); i++) {        
+        tempSum += static_cast<int16_t>((getPayload())[i]);
     }
 
     // % checksum 
     while (tempSum > 255) {
-        tempSum = tempSum % _totalSize;
+        tempSum = tempSum % getTotalSize();
     }
 
     // set checksum
@@ -110,16 +131,23 @@ void Message::_genChecksum() {
 }
 
 
+/////////////////////////
+// namespace functions // 
+/////////////////////////
+
 bool checkChecksum(Message* msg) {
     // calc actual checksum
-    uint32_t tempSum = 0; 
+    uint16_t tempSum = 0; 
 
     // add MsgType to checksum
-    tempSum += static_cast<int>(msg->getMsgType());
+    tempSum += static_cast<int16_t>(msg->getMsgType());
+
+    // add payload size to checksum
+    tempSum += static_cast<int16_t>(msg->getPayloadSize()));
 
     // add payload to checksum
     for (uint8_t i = 0; i < msg->getPayloadSize(); i++) {        
-        tempSum += static_cast<int>((msg->getPayload())[i]);
+        tempSum += static_cast<int16_t>((msg->getPayload())[i]);
     }
 
     // % checksum 
@@ -133,7 +161,10 @@ bool checkChecksum(Message* msg) {
 
 void sendMessage(void* SerialComObj, Message* msg) {
     // write preambel
-    SerialComObj->write('~');
+    SerialComObj->write(_SMU_COM_BACKEND_PREAMBEL_SING);
+
+    // write message type 
+    SerialComObj->write(msg->getPayloadSize());
 
     // write message type 
     SerialComObj->write(msg->getMsgType());
@@ -142,5 +173,85 @@ void sendMessage(void* SerialComObj, Message* msg) {
     SerialComObj->write(msg->getPayload(), msg->getPayloadSize());
 
     // write end-sign
-    SerialComObj->write('#');
+    SerialComObj->write(_SMU_COM_BACKEND_END_SING);
+}
+
+bool readNextMessage(void* SerialComObj, Message* msg) {
+    // check if enought bytes have been received
+    if (SerialComObj->available() < 5) {
+        msg->getMsgType = MessageType::None;
+        return false;
+    }
+
+    // timeout stuff
+    uint32_t tempForTime = millis();
+
+    // find preambel
+    while (true) {
+        // check timeout & availability
+        if (SerialComObj->available() <= 0 || tempForTime + serialComTimeout < millis()) {
+            msg->getMsgType = MessageType::None;
+            return false;
+        }
+        
+        // read byte & check 
+        if(SerialComObj->read() == _SMU_COM_BACKEND_PREAMBEL_SING) {
+            break;
+        }
+    }
+
+    // read message type
+    if (SerialComObj->available() <= 4) {
+        msg->getMsgType = MessageType::None;
+        return false;
+    }
+    msg->setMsgType(SerialComObj->read());
+    
+    // read payload size
+    uint8_t payloadSize = SerialComObj->read();
+
+    // read payload & checksum
+    uint8_t counter = 0;
+    uint8_t payload[25] = {0};
+    tempForTime = millis();
+    while (true) {
+        // check timeout
+        if (tempForTime + serialComTimeout < millis()) {
+            msg->getMsgType = MessageType::None;
+            return false;
+        }
+        
+        // check availability
+        if (SerialComObj->available() > 0) {
+            uint8_t b = SerialComObj->read();
+            
+            counter++;
+
+            if (counter < payloadSize) {
+                // reading payload part
+                payload[counter] = b;
+            }
+            else if (counter == payloadSize){
+                // reading checksum part
+                msg->setPayload(payload, payloadSize);
+                msg->setChecksum(b);
+            }
+            else {
+                // check for end-sing
+                if (b ==  _SMU_COM_BACKEND_END_SING) {
+                    // check checksum
+                    if (checkChecksum(msg)) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                else {
+                    msg->getMsgType = MessageType::None;
+                    return false;
+                }
+            }
+        }
+    }
 }
