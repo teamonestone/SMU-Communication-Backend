@@ -116,6 +116,8 @@ namespace SMU_Com_Backend
 
 	bool checkChecksum(Message* msg);
 
+	void sendMessage(void* SerialComObj, Message* msg);
+
 };
 
 #endif

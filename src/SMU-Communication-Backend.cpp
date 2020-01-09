@@ -130,3 +130,17 @@ bool checkChecksum(Message* msg) {
     // compare checksum
     (msg->getChecksum() == tempSum) ? return true : return false; 
 }
+
+void sendMessage(void* SerialComObj, Message* msg) {
+    // write preambel
+    SerialComObj->write('~');
+
+    // write message type 
+    SerialComObj->write(msg->getMsgType());
+
+    // write payload
+    SerialComObj->write(msg->getPayload(), msg->getPayloadSize());
+
+    // write end-sign
+    SerialComObj->write('#');
+}
