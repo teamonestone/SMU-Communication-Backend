@@ -16,6 +16,7 @@
 
 using namespace SMU_Com_Backend;
 
+
 ///////////////////////
 // class construcots //
 ///////////////////////
@@ -35,7 +36,7 @@ Message::Message(MessageType msgType) {
 
 	_setPayloadZero();
 	
-    _setChecksum();
+    _updateChecksum();
 }
 
 Message::Message(MessageType msgType, uint8_t payload[_SMU_COM_BACKEND_MAX_PAYLOAD_SIZE], uint8_t payloadSize) {
@@ -49,12 +50,13 @@ Message::Message(MessageType msgType, uint8_t payload[_SMU_COM_BACKEND_MAX_PAYLO
         _payload[i] = payload[i];
     }
 
-    _setChecksum();
+    _updateChecksum();
 }
 
-Message::~Message(){
+Message::~Message() {
     
 }
+
 
 /////////////////////
 // class functions //
@@ -64,7 +66,7 @@ void Message::setMsgType(MessageType msgType) {
     _MsgType = msgType;
 
     // update checksum
-    _setChecksum();
+    _updateChecksum();
 }
 
 bool Message::setPayload(uint8_t payload[_SMU_COM_BACKEND_MAX_PAYLOAD_SIZE], uint8_t payloadSize) {
@@ -73,7 +75,8 @@ bool Message::setPayload(uint8_t payload[_SMU_COM_BACKEND_MAX_PAYLOAD_SIZE], uin
         return false;
     }
 
-    _payloadSize = _payloadSize;
+	_setPayloadZero();
+    _payloadSize = payloadSize;
 
     // copy payload
     for (uint8_t i = 0; i < _payloadSize; i++) {
@@ -81,7 +84,7 @@ bool Message::setPayload(uint8_t payload[_SMU_COM_BACKEND_MAX_PAYLOAD_SIZE], uin
     }
 
     // update checksum
-    _setChecksum();
+    _updateChecksum();
 
     return true;
 }
@@ -110,7 +113,7 @@ uint8_t Message::getChecksum() {
     return _checksum;
 }
 
-void Message::_setChecksum() {
+void Message::_updateChecksum() {
     // set checksum
     _checksum = genCheckSum(getMsgType(), getPayloadSize(), getPayload());
 }
@@ -120,6 +123,7 @@ void Message::_setPayloadZero() {
 		_payload[i] = 0;
 	}
 }
+
 
 /////////////////////////
 // namespace functions // 
@@ -150,7 +154,7 @@ uint8_t SMU_Com_Backend::genCheckSum(MessageType msgType, uint8_t payloadSize, u
 }
 
 bool SMU_Com_Backend::checkChecksum(Message* msg) {
-    if (genCheckSum(msg->getMsgType(), msg->getPayloadSize(), msg->getPayload()) == msg->getChecksum()) {
+	if (genCheckSum(msg->getMsgType(), msg->getPayloadSize(), msg->getPayload()) == msg->getChecksum()) {
         return true;
     }
     else {
@@ -177,59 +181,76 @@ bool SMU_Com_Backend::checkChecksum(MessageType msgType, uint8_t payloadSize, ui
 }
 
 void SMU_Com_Backend::sendMessage(Message* msg) {
+	// init serial-com
+	_SMU_COM_BACKEND_SERIAL_INTERFACE.begin(_SMU_COM_BACKEND_BAUD_RATE);
+	
     // write preambel
-    serialInterface.write(_SMU_COM_BACKEND_PREAMBEL_SING);
+    _SMU_COM_BACKEND_SERIAL_INTERFACE.write(_SMU_COM_BACKEND_PREAMBEL_SING);
 
     // write message type 
-    serialInterface.write(msg->getPayloadSize());
+    _SMU_COM_BACKEND_SERIAL_INTERFACE.write(msg->getMsgType());
 
-    // write message type 
-    serialInterface.write(msg->getMsgType());
+	// write payload size
+    _SMU_COM_BACKEND_SERIAL_INTERFACE.write(msg->getPayloadSize());
 
     // write payload
-    serialInterface.write(msg->getPayload(), msg->getPayloadSize());
+	for (uint8_t i = 0; i < msg->getPayloadSize(); i++) {
+		_SMU_COM_BACKEND_SERIAL_INTERFACE.write((msg->getPayload())[i]);
+	}
+	
+	// write checksum
+    _SMU_COM_BACKEND_SERIAL_INTERFACE.write(msg->getChecksum());
 
     // write end-sign
-    serialInterface.write(_SMU_COM_BACKEND_END_SING);
+    _SMU_COM_BACKEND_SERIAL_INTERFACE.write(_SMU_COM_BACKEND_END_SING);
+	
+	// flush serial port
+	_SMU_COM_BACKEND_SERIAL_INTERFACE.flush();
 }
 
 bool SMU_Com_Backend::readNextMessage(Message* msg) {
+	uint32_t tempForTime = 0;
+	uint8_t payloadSize = 0;
+    uint8_t counter = 0;
+    uint8_t payload[25] = {0};
+	
+	// init serial-com
+	_SMU_COM_BACKEND_SERIAL_INTERFACE.begin(_SMU_COM_BACKEND_BAUD_RATE);
+	
     // check if enought bytes have been received
-    if (serialInterface.available() < 5) {
+    if (_SMU_COM_BACKEND_SERIAL_INTERFACE.available() < 5) {
         msg->setMsgType(MessageType::NONE);
         return false;
     }
 
     // timeout stuff
-    uint32_t tempForTime = millis();
+    tempForTime = millis();
 
     // find preambel
     while (true) {
         // check timeout & availability
-        if (serialInterface.available() <= 0 || tempForTime + serialComTimeout < millis()) {
+        if (_SMU_COM_BACKEND_SERIAL_INTERFACE.available() <= 0 || tempForTime + serialComTimeout < millis()) {
             msg->setMsgType(MessageType::NONE);
             return false;
         }
         
         // read byte & check 
-        if(serialInterface.read() == _SMU_COM_BACKEND_PREAMBEL_SING) {
+        if(_SMU_COM_BACKEND_SERIAL_INTERFACE.read() == _SMU_COM_BACKEND_PREAMBEL_SING) {
             break;
         }
     }
 
     // read message type
-    if (serialInterface.available() <= 4) {
+    if (_SMU_COM_BACKEND_SERIAL_INTERFACE.available() <= 4) {
         msg->setMsgType(MessageType::NONE);
         return false;
     }
-    msg->setMsgType(static_cast<MessageType>(serialInterface.read()));
+    msg->setMsgType(static_cast<MessageType>(_SMU_COM_BACKEND_SERIAL_INTERFACE.read()));
     
     // read payload size
-    uint8_t payloadSize = serialInterface.read();
+    payloadSize = static_cast<uint8_t>(_SMU_COM_BACKEND_SERIAL_INTERFACE.read());
 
     // read payload & checksum
-    uint8_t counter = 0;
-    uint8_t payload[25] = {0};
     tempForTime = millis();
     while (true) {
         // check timeout
@@ -239,10 +260,8 @@ bool SMU_Com_Backend::readNextMessage(Message* msg) {
         }
         
         // check availability
-        if (serialInterface.available() > 0) {
-            uint8_t b = serialInterface.read();
-            
-            counter++;
+        if (_SMU_COM_BACKEND_SERIAL_INTERFACE.available() > 0) {
+            uint8_t b = _SMU_COM_BACKEND_SERIAL_INTERFACE.read();
 
             if (counter < payloadSize) {
                 // reading payload part
@@ -269,6 +288,8 @@ bool SMU_Com_Backend::readNextMessage(Message* msg) {
                     return false;
                 }
             }
+			
+			counter++;
         }
     }
 }

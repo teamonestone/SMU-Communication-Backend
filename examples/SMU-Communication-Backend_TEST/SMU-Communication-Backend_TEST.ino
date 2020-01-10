@@ -5,7 +5,7 @@ using namespace SMU_Com_Backend;
 void setup() {
 	// init serial-com
 	Serial.begin(9600);
-	Serial1.begin(9600);
+	Serial3.begin(115200);
 }
 
 void loop() {
@@ -17,10 +17,12 @@ void loop() {
 	uint8_t payload[25] = {0};
 	for (uint8_t i = 0; i < 25; i++) {
 		payload[i] = static_cast<uint8_t>(random(255));
+		/*
 		Serial.print("    [");
 		Serial.print(i);
 		Serial.print("]: ");
 		Serial.println(payload[i]);
+		*/
 	}
 	Serial.println("done!");
 	Message msg(MessageType::PONG, payload, 25);
@@ -28,19 +30,19 @@ void loop() {
 	// checksum test
 	Serial.print("Checksum Check: ");
 	Serial.println(checkChecksum(&msg));
-	
+
 	// send message
 	Serial.println("Send Message... ");
 	sendMessage(&msg);
 	Serial.println("done!");
 
+	//delay(500);
+
 	Serial.println();
 
-	// read message
 	Message msgRd;
 	Serial.print("Read Message: ");
 	Serial.println(readNextMessage(&msgRd));
-	
 
 	Serial.println("---------------------------------------------------");
 	delay(1000);

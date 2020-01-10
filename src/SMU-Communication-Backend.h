@@ -31,6 +31,8 @@
 #define _SMU_COM_BACKEND_END_SING '#'
 #define _SMU_COM_BACKEND_MAX_PAYLOAD_SIZE 25
 #define _SMU_COM_BACKEND_TOTAL_SIZE_OFFSET 3
+#define _SMU_COM_BACKEND_BAUD_RATE 115200
+#define _SMU_COM_BACKEND_SERIAL_INTERFACE Serial3
 
 
 /////////////
@@ -120,7 +122,7 @@ namespace SMU_Com_Backend
 
 			uint8_t _checksum;
 
-			void _setChecksum();
+			void _updateChecksum();
 			void _setPayloadZero();
 
 		// End PRIVATE -------------------------------------------------------------------
@@ -132,7 +134,7 @@ namespace SMU_Com_Backend
 	///////////////
 
 	static uint16_t serialComTimeout = 50;
-	static HardwareSerial serialInterface = Serial1;
+	//static HardwareSerial serialInterface = Serial3;
 
 
 	///////////////
