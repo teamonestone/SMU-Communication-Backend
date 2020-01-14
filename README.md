@@ -1,6 +1,7 @@
 # SMU-Communication-Backend
 The Communication Backend for the [Universal-I2C-Sensor-Master-Unit](https://github.com/teamonestone/Universal-I2C-Sensor-Master-Unit).
 
+
 ## General Message Formate
 
 All serial messages used to controll the SMU board follow the following format: 
@@ -11,6 +12,7 @@ All serial messages used to controll the SMU board follow the following format:
 |      1 Char     |   1 Byte    |    1 Byte   |     0 - 25 Bytes     |  1 Byte  |      1 Char     |
 |-----------------|-------------|-------------|----------------------|----------|-----------------|
 ```
+
 
 ## MessageType
 
@@ -29,6 +31,7 @@ All serial messages used to controll the SMU board follow the following format:
 | 70       | 0x46     | `AUTO_UPDATE` | 8-bit status (1 or 0)                                    | Activates or deactivates the automatic sensor update      |
 | 71       | 0x47     | `MAN_UPDATE`  | 8-bit sensor no.                                         | Performs a manual update of the given sensor              |
 | 100      | 0x64     | `READ_SENSOR` | 8-bit sensor no.                                         | Request the sensor reading of the specified sensor        |
+
 
 ## Message Flow
 
@@ -51,4 +54,15 @@ If the format of a received message is incorrect or the checksum does not match,
 
 | MessageType of Answer | Data Bytes of Answer                                              | Payload-Size [bytes] |
 |-----------------------|-------------------------------------------------------------------|----------------------|
-| `ACK_FAULT`           | received message type + additional information                    | up to 25             |
+| `ACK_FAULT`           | received message type + communication error information           | up to 25             |
+
+
+## communication error information
+
+| Error Code      | Error Code [HEX] | Error Description           | Data Bytes                                                     |
+|-----------------|------------------|-----------------------------|----------------------------------------------------------------|
+| `NONE`          | 0x00             | no error                    | -                                                              |
+| `NO_START_SIGN` | 0x01             | no start sign was found     | -                                                              |
+| `NO_END_SING`   | 0x02             | no end sign was found       | opt. rec. msg. type                                            |
+| `INV_PAYL_SIZE` | 0x03             | the payload-size is invalid | opt. rec. msg. type + opt. rec. payload-size                   |
+| `INV_CHECKSUM`  | 0x04             | the checksum is invalid     | opt. rec. msg. type + opt. rec. checksum + opt. calc. checksum |
