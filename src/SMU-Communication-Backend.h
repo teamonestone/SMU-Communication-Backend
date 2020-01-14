@@ -56,7 +56,9 @@ namespace SMU_Com_Backend
 	 * 
 	 * @brief Enum that represents the differnet Messages Types for the serial communication.
 	 */ 
-	enum MessageType : int16_t {
+	enum MessageType : int8_t {
+		ERROR = 0xff,				// =^ -1
+
 		NONE = 0x00,
 
 		ACK_FAULT = 0x01,

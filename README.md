@@ -11,11 +11,13 @@ All serial messages used to controll the SMU board follow the following format:
 |      1 Char     |   1 Byte    |    1 Byte   |     0 - 25 Bytes     |  1 Byte  |      1 Char     |
 |-----------------|-------------|-------------|----------------------|----------|-----------------|
 ```
+
 ## MessageType
 
 | Dec-Code | Hex-Code | MessageType   | Data Bytes                                               | Description                                               |
 |----------|----------|---------------|----------------------------------------------------------|-----------------------------------------------------------|
-| 0        | 0x00     | `NONE`        | -                                                        | Empty message                                             |
+| -1       | 0xff     | `ERROR`       | additional information (up to 25 bytes)                  | message type to indicate an error                         |
+| 0        | 0x00     | `NONE`        | -                                                        | empty message -> no message                               |
 | 1        | 0x01     | `ACK_FAULT`   | 8-bit message-type of last rec message + error code      | Indicates a coomunication error                           |
 | 2        | 0x02     | `ACK`         | 8-bit message-type that is been acknowledged + payload   | ACK + payload send back (can be up to 24 bytes)           | 
 | 3        | 0x03     | `PONG`        | 8-bit random value                                       | Ping Request                                              |
