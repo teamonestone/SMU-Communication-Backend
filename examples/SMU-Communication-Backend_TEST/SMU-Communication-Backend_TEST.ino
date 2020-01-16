@@ -1,6 +1,6 @@
 #include "SMU-Communication-Backend.h"
 
-using namespace SMU_Com_Backend;
+using namespace smu_com_backend;
 
 void setup() {
 	// init serial-com

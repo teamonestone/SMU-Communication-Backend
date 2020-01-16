@@ -18,7 +18,7 @@
 #define _SMU_COM_BACKEND_LIB_VERSION 100
 
 // used namespaces
-using namespace SMU_Com_Backend;
+using namespace smu_com_backend;
 
 
 ///////////////////////
@@ -213,7 +213,7 @@ void Message::_setPayloadZero() {
  * 
  * @return The caluculated checksum as uint8_t.
  */
-uint8_t SMU_Com_Backend::genCheckSum(MessageType msgType, uint8_t payloadSize, uint8_t payload[25]) {
+uint8_t smu_com_backend::genCheckSum(MessageType msgType, uint8_t payloadSize, uint8_t payload[25]) {
     // calc actual checksum
     uint16_t tempSum = 0; 
 
@@ -244,7 +244,7 @@ uint8_t SMU_Com_Backend::genCheckSum(MessageType msgType, uint8_t payloadSize, u
  * 
  * @return True if checksum is correct, else false.
  */
-bool SMU_Com_Backend::checkChecksum(Message* msg) {
+bool smu_com_backend::checkChecksum(Message* msg) {
 	if (genCheckSum(msg->getMsgType(), msg->getPayloadSize(), msg->getPayload()) == msg->getChecksum()) {
         return true;
     }
@@ -261,7 +261,7 @@ bool SMU_Com_Backend::checkChecksum(Message* msg) {
  * 
  * @return True if both are equal, else false.
  */
-bool SMU_Com_Backend::checkChecksum(Message* msg, uint8_t checksum) {
+bool smu_com_backend::checkChecksum(Message* msg, uint8_t checksum) {
     if (genCheckSum(msg->getMsgType(), msg->getPayloadSize(), msg->getPayload()) == checksum) {
         return true;
     }
@@ -280,7 +280,7 @@ bool SMU_Com_Backend::checkChecksum(Message* msg, uint8_t checksum) {
  * 
  * @return True if both are equal, else false.
  */
-bool SMU_Com_Backend::checkChecksum(MessageType msgType, uint8_t payloadSize, uint8_t payload[25], uint8_t checksum) {
+bool smu_com_backend::checkChecksum(MessageType msgType, uint8_t payloadSize, uint8_t payload[25], uint8_t checksum) {
     if (genCheckSum(msgType, payloadSize, payload) == checksum) {
         return true;
     }
@@ -294,7 +294,7 @@ bool SMU_Com_Backend::checkChecksum(MessageType msgType, uint8_t payloadSize, ui
  * 
  * @param msg Pointer to a message as Message*.
  */
-void SMU_Com_Backend::sendMessage(Message* msg) {
+void smu_com_backend::sendMessage(Message* msg) {
 	// init serial-com
 	_SMU_COM_BACKEND_SERIAL_INTERFACE.begin(_SMU_COM_BACKEND_BAUD_RATE);
 	
@@ -329,7 +329,7 @@ void SMU_Com_Backend::sendMessage(Message* msg) {
  * 
  * @return True on success, else false.
  */
-bool SMU_Com_Backend::readNextMessage(Message* msg) {
+bool smu_com_backend::readNextMessage(Message* msg) {
 	uint32_t tempForTime = 0;
 	uint8_t payloadSize = 0;
     uint8_t counter = 0;
@@ -445,6 +445,6 @@ bool SMU_Com_Backend::readNextMessage(Message* msg) {
  * 
  * @retrun the current version of the library.
  */
-uint16_t SMU_Com_Backend::getVersion() {
+uint16_t smu_com_backend::getVersion() {
     return _SMU_COM_BACKEND_LIB_VERSION;
 }

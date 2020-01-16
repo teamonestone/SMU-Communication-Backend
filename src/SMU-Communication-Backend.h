@@ -40,11 +40,11 @@
 /////////////
 
 /**
- * @namespace SMU_Com_Backend
+ * @namespace smu_com_backend
  * 
  * @brief Namespace for SMU-Communication-Backend related stuff.
  */
-namespace SMU_Com_Backend
+namespace smu_com_backend
 {
 	///////////
 	// enums //
@@ -173,7 +173,6 @@ namespace SMU_Com_Backend
 	bool readNextMessage(Message* msg);
 
 	uint16_t getVersion(); 
-
 }
 
 #endif

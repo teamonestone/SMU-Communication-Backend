@@ -6,7 +6,7 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-SMU_Com_Backend	KEYWORD1
+smu_com_backend	KEYWORD1
 MessageType	KEYWORD1
 ComErrorInfo	KEYWORD1
 Message	KEYWORD1
