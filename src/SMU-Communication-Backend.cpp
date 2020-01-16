@@ -14,6 +14,9 @@
 // associated header
 #include "SMU-Communication-Backend.h"
 
+// defines
+#define _SMU_COM_BACKEND_LIB_VERSION 100
+
 // used namespaces
 using namespace SMU_Com_Backend;
 
@@ -22,6 +25,10 @@ using namespace SMU_Com_Backend;
 // class construcots //
 ///////////////////////
 
+/**
+ * @brief Default Constructor of the Message class.
+ * 
+ */
 Message::Message() {
     _MsgType = MessageType::NONE;
     _payloadSize = 0;
@@ -31,6 +38,11 @@ Message::Message() {
     _checksum = 0;
 }
 
+/**
+ * @brief Empty Message Construcotr.
+ * 
+ * @param The message type of the message.
+ */
 Message::Message(MessageType msgType) {
     _MsgType = msgType;
     _payloadSize = 0;
@@ -40,6 +52,13 @@ Message::Message(MessageType msgType) {
     _updateChecksum();
 }
 
+/**
+ * @brief Full Constructor.
+ * 
+ * @param msgType The message type of the message.
+ * @param payload Pointer to an array with up to 25 bytes of payload.
+ * @param payloadSize The size of the payload in bytes. 
+ */
 Message::Message(MessageType msgType, uint8_t payload[_SMU_COM_BACKEND_MAX_PAYLOAD_SIZE], uint8_t payloadSize) {
     _MsgType = msgType;
     _payloadSize = payloadSize;
@@ -54,6 +73,10 @@ Message::Message(MessageType msgType, uint8_t payload[_SMU_COM_BACKEND_MAX_PAYLO
     _updateChecksum();
 }
 
+/**
+ * @brief Default Destructor of the Message class.
+ *  
+ */
 Message::~Message() {
     
 }
@@ -63,6 +86,11 @@ Message::~Message() {
 // class functions //
 /////////////////////
 
+/**
+ * @brief Set the new message type of a message.
+ * 
+ * @param msgType the new message type.
+ */
 void Message::setMsgType(MessageType msgType) {
     _MsgType = msgType;
 
@@ -70,6 +98,14 @@ void Message::setMsgType(MessageType msgType) {
     _updateChecksum();
 }
 
+/**
+ * @brief Set the new payload of a message.
+ * 
+ * @param payload Pointer to an array with up to 25 bytes of new payload.
+ * @param payloadSize The size of the new payload in bytes. 
+ * 
+ * @return true on success, else false.
+ */
 bool Message::setPayload(uint8_t payload[_SMU_COM_BACKEND_MAX_PAYLOAD_SIZE], uint8_t payloadSize) {
     // payload size check
     if (payloadSize > _SMU_COM_BACKEND_MAX_PAYLOAD_SIZE) {
@@ -90,35 +126,73 @@ bool Message::setPayload(uint8_t payload[_SMU_COM_BACKEND_MAX_PAYLOAD_SIZE], uin
     return true;
 }
 
+/**
+ * @brief Set the new checksum of a message.
+ * 
+ * @param checksum The new checksum.
+ */
 void Message::setChecksum(uint8_t checksum) {
     _checksum = checksum;
 }
 
+/**
+ * @brief Get the message type ot a message.
+ * 
+ * @return The message type as SUM_Com_Backend::MessageType.
+ */
 MessageType Message::getMsgType() {
     return _MsgType;
 }
 
+/**
+ * @brief Get the Pointer to the payload of a message.
+ * 
+ * @return The pointer to the payload as uint8_t*.
+ */
 uint8_t* Message::getPayload() {
     return _payload;
 }
 
+/**
+ * @brief Get the size of the payload of a message.
+ * 
+ * @return The size of the payload in bytes as uint8_t.
+ */
 uint8_t Message::getPayloadSize() {
     return _payloadSize;
 }
 
+/**
+ * @brief Get the totla size of a message.
+ * 
+ * @return The total size of the message in bytes as uint8_t.
+ */
 uint8_t Message::getTotalSize() {
     return _payloadSize + _SMU_COM_BACKEND_TOTAL_SIZE_OFFSET;
 }
 
+/**
+ * @brief Get the checksum of a message.
+ * 
+ * @return The checksum of the message as uint8_t.
+ */
 uint8_t Message::getChecksum() {
     return _checksum;
 }
 
+/**
+ * @brief Updates the checksum of an message.
+ * 
+ */
 void Message::_updateChecksum() {
     // set checksum
     _checksum = genCheckSum(getMsgType(), getPayloadSize(), getPayload());
 }
 
+/**
+ * @brief Sets the payload of an message to all zeros.
+ * 
+ */
 void Message::_setPayloadZero() {
 	for (uint8_t i = 0; i < _SMU_COM_BACKEND_MAX_PAYLOAD_SIZE; i++) {
 		_payload[i] = 0;
@@ -130,6 +204,15 @@ void Message::_setPayloadZero() {
 // namespace functions // 
 /////////////////////////
 
+/**
+ * @brief Calculates a Checksum.
+ * 
+ * @param msgType The message type of the message.
+ * @param payloadSize The size of the payload in bytes. 
+ * @param payload Pointer to an array with up to 25 bytes of payload.
+ * 
+ * @return The caluculated checksum as uint8_t.
+ */
 uint8_t SMU_Com_Backend::genCheckSum(MessageType msgType, uint8_t payloadSize, uint8_t payload[25]) {
     // calc actual checksum
     uint16_t tempSum = 0; 
@@ -154,6 +237,13 @@ uint8_t SMU_Com_Backend::genCheckSum(MessageType msgType, uint8_t payloadSize, u
     return static_cast<uint8_t>(tempSum);
 }
 
+/**
+ * @brief Checks if the checksum that is stored in a message is correct.
+ * 
+ * @param msg A pointer to the message which should be checked as Message*.
+ * 
+ * @return True if checksum is correct, else false.
+ */
 bool SMU_Com_Backend::checkChecksum(Message* msg) {
 	if (genCheckSum(msg->getMsgType(), msg->getPayloadSize(), msg->getPayload()) == msg->getChecksum()) {
         return true;
@@ -163,6 +253,14 @@ bool SMU_Com_Backend::checkChecksum(Message* msg) {
     }
 }
 
+/**
+ * @brief Check is the claculated checksum and a other checksum are equal.
+ * 
+ * @param msg Pointer to a message as Message*.
+ * @param checksum A given checksum as uint8_t.
+ * 
+ * @return True if both are equal, else false.
+ */
 bool SMU_Com_Backend::checkChecksum(Message* msg, uint8_t checksum) {
     if (genCheckSum(msg->getMsgType(), msg->getPayloadSize(), msg->getPayload()) == checksum) {
         return true;
@@ -172,6 +270,16 @@ bool SMU_Com_Backend::checkChecksum(Message* msg, uint8_t checksum) {
     }
 }
 
+/**
+ * @brief Checks if the checksum of given data is equal to another checksum.
+ * 
+ * @param msgType The message type..
+ * @param payloadSize The size of the payload in bytes. 
+ * @param payload Pointer to an array with up to 25 bytes of payload.
+ * @param checksum  A given checksum as uint8_t.
+ * 
+ * @return True if both are equal, else false.
+ */
 bool SMU_Com_Backend::checkChecksum(MessageType msgType, uint8_t payloadSize, uint8_t payload[25], uint8_t checksum) {
     if (genCheckSum(msgType, payloadSize, payload) == checksum) {
         return true;
@@ -181,6 +289,11 @@ bool SMU_Com_Backend::checkChecksum(MessageType msgType, uint8_t payloadSize, ui
     }
 }
 
+/**
+ * @brief Sends message over a defined Serial interface.
+ * 
+ * @param msg Pointer to a message as Message*.
+ */
 void SMU_Com_Backend::sendMessage(Message* msg) {
 	// init serial-com
 	_SMU_COM_BACKEND_SERIAL_INTERFACE.begin(_SMU_COM_BACKEND_BAUD_RATE);
@@ -209,6 +322,13 @@ void SMU_Com_Backend::sendMessage(Message* msg) {
 	_SMU_COM_BACKEND_SERIAL_INTERFACE.flush();
 }
 
+/**
+ * @brief Reads the next message out of the serial buffer if one is available.
+ * 
+ * @param msg  A pointer to a Message object where the received message should be stored.
+ * 
+ * @return True on success, else false.
+ */
 bool SMU_Com_Backend::readNextMessage(Message* msg) {
 	uint32_t tempForTime = 0;
 	uint8_t payloadSize = 0;
@@ -293,4 +413,13 @@ bool SMU_Com_Backend::readNextMessage(Message* msg) {
 			counter++;
         }
     }
+}
+
+/**
+ * @brief Get the version of the library.
+ * 
+ * @retrun the current version of the library.
+ */
+uint16_t Message::getVersion() {
+    return _SMU_COM_BACKEND_LIB_VERSION;
 }

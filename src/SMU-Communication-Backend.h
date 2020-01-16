@@ -111,8 +111,7 @@ namespace SMU_Com_Backend
 			uint8_t getPayloadSize();
 
 			uint8_t getTotalSize();
-			uint8_t getChecksum();
-
+			uint8_t getChecksum();  
 
 		// End PUBLIC --------------------------------------------------------------------
 
@@ -137,6 +136,7 @@ namespace SMU_Com_Backend
 	///////////////
 
 	static uint16_t serialComTimeout = 50;
+	uint16_t const _libVersion = 100;
 	//static HardwareSerial serialInterface = Serial3;
 
 
@@ -153,6 +153,8 @@ namespace SMU_Com_Backend
 	void sendMessage(Message* msg);
 
 	bool readNextMessage(Message* msg);
+
+	uint16_t getVersion(); 
 
 }
 
