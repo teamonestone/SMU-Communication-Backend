@@ -26,6 +26,8 @@ All serial messages used to controll the SMU board follow the following format:
 | 4        | 0x04     | `GET_STATUS`  | -                                                        | Get the current system stauts code from the SMU           |
 | 5        | 0x05     | `GET_ERROR`   | -                                                        | Get the current system error code from the SMU            |
 | 6        | 0x06     | `RESET`       | -                                                        | Perform a soft reset of the SMU                           |
+| 10       | 0x0a     | `FIRMWARE_V`  | -                                                        | Request the firmware-version of the SMU                   |
+| 11       | 0x0b     | `COM_BACK_V`  | -                                                        | Request the communication backend version of the SMU      |
 | 30       | 0x1e     | `INIT_SENSOR` | 8-bit sensor-type + 8-bit sensor port                    | Starts the initialization of a sensor at a given new port |
 | 31       | 0x1f     | `SET_ACTIVE`  | 8-bit sensor no. + 8-bit status (1 or 0)                 | Activates or deactivates a sensor                         |
 | 70       | 0x46     | `AUTO_UPDATE` | 8-bit status (1 or 0)                                    | Activates or deactivates the automatic sensor update      |
@@ -44,6 +46,8 @@ All serial messages used to controll the SMU board follow the following format:
 | `GET_STATUS`  | yes     | `ACK`                 | `GET_STATUS` +  8-bit status code                                 | 1 + 1 = 2            |
 | `GET_ERROR`   | yes     | `ACK`                 | `GET_ERROR` + 8-bit error code                                    | 1 + 1 = 2            |
 | `RESET`       | yes     | `ACK`                 | `RESET`                                                           | 1                    |
+| `FIRMWARE_V`  | yes     | `ACK`                 | `FIRMWARE_V` + 8-bit version                                      | 1 + 1 = 2            |
+| `COM_BACK_V`  | yes     | `ACK`                 | `COM_BACK_V` + 8-bit version                                      | 1 + 1 = 2            |
 | `INIT_SENSOR` | yes     | `ACK`                 | `INIT_SENSOR` + success byte (1 or 0) + assigned 8-bit sensor no. | 1 + 2 = 3            |
 | `SET_ACTIVE`  | yes     | `ACK`                 | `SET_ACTIVE` + success byte (1 or 0)                              | 1 + 1 = 2            |
 | `AUTO_UPDATE` | yes     | `ACK`                 | `AUTO_UPDATE` + success byte (1 or 0)                             | 1 + 1 = 2            |
@@ -59,10 +63,12 @@ If the format of a received message is incorrect or the checksum does not match,
 
 ## communication error information
 
-| Error Code      | Error Code [HEX] | Error Description           | Data Bytes                                                     |
-|-----------------|------------------|-----------------------------|----------------------------------------------------------------|
-| `NONE`          | 0x00             | no error                    | -                                                              |
-| `NO_START_SIGN` | 0x01             | no start sign was found     | -                                                              |
-| `NO_END_SING`   | 0x02             | no end sign was found       | opt. rec. msg. type                                            |
-| `INV_PAYL_SIZE` | 0x03             | the payload-size is invalid | opt. rec. msg. type + opt. rec. payload-size                   |
-| `INV_CHECKSUM`  | 0x04             | the checksum is invalid     | opt. rec. msg. type + opt. rec. checksum + opt. calc. checksum |
+| Error Code        | Error Code [HEX] | Error Description              | Data Bytes                                                     |
+|-------------------|------------------|--------------------------------|----------------------------------------------------------------|
+| `NO_ERROR`            | 0x00             | no error                       | -                                                              |
+| `NO_START_SIGN`   | 0x01             | no start sign was found        | -                                                              |
+| `NO_END_SING`     | 0x02             | no end sign was found          | opt. rec. msg. type                                            |
+| `INV_PAYL_SIZE`   | 0x03             | the payload-size is invalid    | opt. rec. msg. type + opt. rec. payload-size                   |
+| `INV_CHECKSUM`    | 0x04             | the checksum is invalid        | opt. rec. msg. type + opt. rec. checksum + opt. calc. checksum |
+| `NOT_ENOUGH_DATA` | 0x05             | not enough data bytes received | opt. rec. msg. type + opt. overall rec. number of bytes        |
+| `REC_TIMEOUT`     | 0x06             | timeout during rec of data     | opt. rec. msg. type + opt. overall rec. number of bytes        |

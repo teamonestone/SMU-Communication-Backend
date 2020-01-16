@@ -57,7 +57,7 @@ namespace SMU_Com_Backend
 	 * @brief Enum that represents the differnet Messages Types for the serial communication.
 	 */ 
 	enum MessageType : int8_t {
-		ERROR = 0xff,				// =^ -1
+		ERROR = -1,
 
 		NONE = 0x00,
 
@@ -69,11 +69,30 @@ namespace SMU_Com_Backend
 		GET_ERROR = 0x05,
 		RESET = 0x06,
 
+		FIRMWARE_V = 0x0a,
+		COM_BACK_V = 0x0b,
+
 		INIT_SENSOR = 0x1e,
 		SET_ACTIVE = 0x1f,
 
 		AUTO_UPDATE = 0x46,
 		MAN_UPDATE = 0x47
+	};
+
+	/**
+	 * @enum ComErrorInfo
+	 * 
+	 * @brief Enum that represents the differnet communication error informations.
+	 */ 
+	enum ComErrorInfo : uint8_t {
+		NO_ERROR = 0x00,
+		
+		NO_START_SIGN = 0x01,
+		NO_END_SING = 0x02,
+		INV_PAYL_SIZE = 0x03,
+		INV_CHECKSUM = 0x04,
+		NOT_ENOUGH_DATA = 0x05,
+		REC_TIMEOUT = 0x06
 	};
 
 	/////////////

@@ -351,7 +351,12 @@ bool SMU_Com_Backend::readNextMessage(Message* msg) {
     while (true) {
         // check timeout & availability
         if (_SMU_COM_BACKEND_SERIAL_INTERFACE.available() <= 0 || tempForTime + serialComTimeout < millis()) {
-            msg->setMsgType(MessageType::NONE);
+            MessageType t = msg->getMsgType();
+            uint8_t p[2] = {0};
+            msg->setMsgType(MessageType::ERROR);
+            p[0] = static_cast<uint8_t>(t);
+            p[1] = static_cast<uint8_t>(ComErrorInfo::NO_START_SIGN);
+            msg->setPayload(p, 2);
             return false;
         }
         
@@ -362,8 +367,12 @@ bool SMU_Com_Backend::readNextMessage(Message* msg) {
     }
 
     // read message type
-    if (_SMU_COM_BACKEND_SERIAL_INTERFACE.available() <= 4) {
-        msg->setMsgType(MessageType::NONE);
+    if (_SMU_COM_BACKEND_SERIAL_INTERFACE.available() < _SMU_COM_BACKEND_TOTAL_SIZE_OFFSET) {  // 4 or more bytes available.
+        uint8_t p[2] = {0};
+        msg->setMsgType(MessageType::ERROR);
+        p[0] = static_cast<uint8_t>(MessageType::NONE);
+        p[1] = static_cast<uint8_t>(ComErrorInfo::NOT_ENOUGH_DATA);
+        msg->setPayload(p, 2);
         return false;
     }
     msg->setMsgType(static_cast<MessageType>(_SMU_COM_BACKEND_SERIAL_INTERFACE.read()));
@@ -376,7 +385,12 @@ bool SMU_Com_Backend::readNextMessage(Message* msg) {
     while (true) {
         // check timeout
         if (tempForTime + serialComTimeout < millis()) {
-            msg->setMsgType(MessageType::NONE);
+            MessageType t = msg->getMsgType();
+            uint8_t p[2] = {0};
+            msg->setMsgType(MessageType::ERROR);
+            p[0] = static_cast<uint8_t>(t);
+            p[1] = static_cast<uint8_t>(ComErrorInfo::REC_TIMEOUT);
+            msg->setPayload(p, 2);
             return false;
         }
         
@@ -401,11 +415,22 @@ bool SMU_Com_Backend::readNextMessage(Message* msg) {
                         return true;
                     }
                     else {
+                        MessageType t = msg->getMsgType();
+                        uint8_t p[2] = {0};
+                        msg->setMsgType(MessageType::ERROR);
+                        p[0] = static_cast<uint8_t>(t);
+                        p[1] = static_cast<uint8_t>(ComErrorInfo::INV_CHECKSUM);
+                        msg->setPayload(p, 2);
                         return false;
                     }
                 }
                 else {
-                    msg->setMsgType(MessageType::NONE);
+                    MessageType t = msg->getMsgType();
+                    uint8_t p[2] = {0};
+                    msg->setMsgType(MessageType::ERROR);
+                    p[0] = static_cast<uint8_t>(t);
+                    p[1] = static_cast<uint8_t>(ComErrorInfo::NO_END_SING);
+                    msg->setPayload(p, 2);
                     return false;
                 }
             }
@@ -420,6 +445,6 @@ bool SMU_Com_Backend::readNextMessage(Message* msg) {
  * 
  * @retrun the current version of the library.
  */
-uint16_t Message::getVersion() {
+uint16_t SMU_Com_Backend::getVersion() {
     return _SMU_COM_BACKEND_LIB_VERSION;
 }

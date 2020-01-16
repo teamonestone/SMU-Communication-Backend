@@ -8,13 +8,12 @@
 
 SMU_Com_Backend	KEYWORD1
 MessageType	KEYWORD1
+ComErrorInfo	KEYWORD1
 Message	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-
-Message	KEYWORD2
 
 setMsgType	KEYWORD2
 setPayload	KEYWORD2
@@ -26,9 +25,11 @@ getPayloadSize	KEYWORD2
 getTotalSize	KEYWORD2
 getChecksum	KEYWORD2
 
+genCheckSum	KEYWORD2
 checkChecksum	KEYWORD2
 sendMessage	KEYWORD2
 readNextMessage	KEYWORD2
+getVersion	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)
@@ -44,3 +45,7 @@ _SMU_COM_BACKEND_PREAMBEL_SING	LITERAL1
 _SMU_COM_BACKEND_END_SING	LITERAL1
 _SMU_COM_BACKEND_MAX_PAYLOAD_SIZE	LITERAL1
 _SMU_COM_BACKEND_TOTAL_SIZE_OFFSET	LITERAL1
+_SMU_COM_BACKEND_BAUD_RATE	LITERAL1
+_SMU_COM_BACKEND_SERIAL_INTERFACE	LITERAL1
+
+_SMU_COM_BACKEND_LIB_VERSION LITERAL1
