@@ -23,7 +23,6 @@
 #include <inttypes.h>
 
 
-
 /////////////
 // Defines //
 /////////////
