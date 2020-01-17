@@ -15,7 +15,7 @@
 #include "SMU-Communication-Backend.h"
 
 // defines
-#define _SMU_COM_BACKEND_LIB_VERSION 100
+#define _SMU_COM_BACKEND_LIB_VERSION 10000
 
 // used namespaces
 using namespace smu_com_backend;
@@ -341,6 +341,7 @@ bool smu_com_backend::readNextMessage(Message* msg) {
     // check if enought bytes have been received
     if (_SMU_COM_BACKEND_SERIAL_INTERFACE.available() < 5) {
         msg->setMsgType(MessageType::NONE);
+        lastComErrorInfo = ComErrorInfo::NO_COM_ERROR;
         return false;
     }
 
@@ -357,6 +358,7 @@ bool smu_com_backend::readNextMessage(Message* msg) {
             p[0] = static_cast<uint8_t>(t);
             p[1] = static_cast<uint8_t>(ComErrorInfo::NO_START_SIGN);
             msg->setPayload(p, 2);
+            lastComErrorInfo = ComErrorInfo::NO_START_SIGN;
             return false;
         }
         
@@ -373,6 +375,7 @@ bool smu_com_backend::readNextMessage(Message* msg) {
         p[0] = static_cast<uint8_t>(MessageType::NONE);
         p[1] = static_cast<uint8_t>(ComErrorInfo::NOT_ENOUGH_DATA);
         msg->setPayload(p, 2);
+        lastComErrorInfo = ComErrorInfo::NOT_ENOUGH_DATA;
         return false;
     }
     msg->setMsgType(static_cast<MessageType>(_SMU_COM_BACKEND_SERIAL_INTERFACE.read()));
@@ -391,6 +394,7 @@ bool smu_com_backend::readNextMessage(Message* msg) {
             p[0] = static_cast<uint8_t>(t);
             p[1] = static_cast<uint8_t>(ComErrorInfo::REC_TIMEOUT);
             msg->setPayload(p, 2);
+            lastComErrorInfo = ComErrorInfo::REC_TIMEOUT;
             return false;
         }
         
@@ -421,6 +425,7 @@ bool smu_com_backend::readNextMessage(Message* msg) {
                         p[0] = static_cast<uint8_t>(t);
                         p[1] = static_cast<uint8_t>(ComErrorInfo::INV_CHECKSUM);
                         msg->setPayload(p, 2);
+                        lastComErrorInfo = ComErrorInfo::INV_CHECKSUM;
                         return false;
                     }
                 }
@@ -431,6 +436,7 @@ bool smu_com_backend::readNextMessage(Message* msg) {
                     p[0] = static_cast<uint8_t>(t);
                     p[1] = static_cast<uint8_t>(ComErrorInfo::NO_END_SING);
                     msg->setPayload(p, 2);
+                    lastComErrorInfo = ComErrorInfo::NO_END_SING;
                     return false;
                 }
             }

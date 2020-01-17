@@ -65,14 +65,17 @@ namespace smu_com_backend
 
 		PONG = 0x03,
 		GET_STATUS = 0x04,
-		GET_ERROR = 0x05,
-		RESET = 0x06,
+		GET_COM_ERROR = 0x05,
+		GET_SMU_ERROR = 0x06,
+
+		RESET = 0x09,
 
 		FIRMWARE_V = 0x0a,
 		COM_BACK_V = 0x0b,
 
 		INIT_SENSOR = 0x1e,
 		SET_ACTIVE = 0x1f,
+		GET_ACTIVE = 0x20,
 
 		AUTO_UPDATE = 0x46,
 		MAN_UPDATE = 0x47
@@ -84,7 +87,7 @@ namespace smu_com_backend
 	 * @brief Enum that represents the differnet communication error informations.
 	 */ 
 	enum ComErrorInfo : uint8_t {
-		NO_ERROR = 0x00,
+		NO_COM_ERROR = 0x00,
 		
 		NO_START_SIGN = 0x01,
 		NO_END_SING = 0x02,
@@ -154,6 +157,7 @@ namespace smu_com_backend
 	///////////////
 
 	static uint16_t serialComTimeout = 50;
+	static ComErrorInfo lastComErrorInfo = ComErrorInfo::NO_COM_ERROR;
 	uint16_t const _libVersion = 100;
 	//static HardwareSerial serialInterface = Serial3;
 
