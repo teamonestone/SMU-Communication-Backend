@@ -181,6 +181,16 @@ uint8_t Message::getChecksum() {
 }
 
 /**
+ * @brief Clear the content of a message.
+ * 
+ */
+void Message::clear() {
+    _setPayloadZero();
+    _payloadSize = 0;
+    _checksum = 0;
+}
+
+/**
  * @brief Updates the checksum of an message.
  * 
  */
