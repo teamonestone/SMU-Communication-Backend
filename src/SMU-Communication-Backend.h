@@ -74,8 +74,8 @@ namespace smu_com_backend
 		COM_BACK_V = 0x0b,
 
 		INIT_SENSOR = 0x1e,
-		S_ACTIVE = 0x1f,
-		G_ACTIVE = 0x20,
+		S_SEN_ACTIVE = 0x1f,
+		G_SEN_ACTIVE = 0x20,
 
 		S_AUTO_UPDATE = 0x46,
 		G_AUTO_UPDATE = 0x47, 
