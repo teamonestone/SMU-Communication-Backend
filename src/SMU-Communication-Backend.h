@@ -164,7 +164,6 @@ namespace smu_com_backend
 
 	static uint16_t serialComTimeout = 50;
 	static ComErrorInfo lastComErrorInfo = ComErrorInfo::NO_COM_ERROR;
-	uint16_t const _libVersion = 100;
 
 
 	///////////////
