@@ -6,10 +6,10 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-smu_com_backend	KEYWORD1
-MessageType	KEYWORD1
+smu_com_backend		KEYWORD1
+MessageType		KEYWORD1
 ComErrorInfo	KEYWORD1
-Message	KEYWORD1
+Message		KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -23,23 +23,65 @@ getMsgType	KEYWORD2
 getPayload	KEYWORD2
 getPayloadSize	KEYWORD2
 getTotalSize	KEYWORD2
-getChecksum	KEYWORD2
+getChecksum		KEYWORD2
 
-genCheckSum	KEYWORD2
+clear	KEYWORD2
+
+genCheckSum		KEYWORD2
+
 checkChecksum	KEYWORD2
-sendMessage	KEYWORD2
-readNextMessage	KEYWORD2
+sendMessage		KEYWORD2
+
+readNextMessage		KEYWORD2
+
 getVersion	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)
 #######################################
 
+ERROR	KEYWORD2
+
+NONE	KEYWORD2
+
+ACK_FAULT	KEYWORD2
+ACK		KEYWORD2
+
+PONG	KEYWORD2
+G_STATUS	KEYWORD2
+G_COM_ERROR		KEYWORD2
+G_SMU_ERROR		KEYWORD2
+
+RESET	KEYWORD2
+
+FIRMWARE_V	KEYWORD2
+COM_BACK_V	KEYWORD2
+
+INIT_SENSOR		KEYWORD2
+S_SEN_ACTIVE	KEYWORD2
+G_SEN_ACTIVE	KEYWORD2
+
+S_AUTO_UPDATE	KEYWORD2
+G_AUTO_UPDATE	KEYWORD2
+MAN_UPDATE	KEYWORD2
+
+READ_SENSOR		KEYWORD2
+
+NO_COM_ERROR	KEYWORD2
+		
+NO_START_SIGN	KEYWORD2
+NO_END_SING		KEYWORD2
+INV_PAYL_SIZE	KEYWORD2
+INV_CHECKSUM	KEYWORD2
+NOT_ENOUGH_DATA		KEYWORD2
+REC_TIMEOUT		KEYWORD2
+
 #######################################
 # Constants (LITERAL1)
 #######################################
 
 serialComTimeout	LITERAL1
+lastComErrorInfo	LITERAL1
 
 _SMU_COM_BACKEND_PREAMBEL_SING	LITERAL1
 _SMU_COM_BACKEND_END_SING	LITERAL1
