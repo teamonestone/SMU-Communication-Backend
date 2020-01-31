@@ -20,6 +20,8 @@
 // used namespaces
 using namespace smu_com_backend;
 
+// software serial
+SoftwareSerial softSerial(9, 10); // RX, TX
 
 ///////////////////////
 // class construcots //

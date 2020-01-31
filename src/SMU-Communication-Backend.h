@@ -22,6 +22,10 @@
 #include "Arduino.h"
 #include <inttypes.h>
 
+// software serial
+#include <SoftwareSerial.h>
+extern SoftwareSerial softSerial;
+
 
 /////////////
 // Defines //
@@ -32,7 +36,7 @@
 #define _SMU_COM_BACKEND_MAX_PAYLOAD_SIZE 25
 #define _SMU_COM_BACKEND_TOTAL_SIZE_OFFSET 3
 #define _SMU_COM_BACKEND_BAUD_RATE 115200
-#define _SMU_COM_BACKEND_SERIAL_INTERFACE Serial3
+#define _SMU_COM_BACKEND_SERIAL_INTERFACE softSerial
 
 
 /////////////
