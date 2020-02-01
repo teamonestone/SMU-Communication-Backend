@@ -23,9 +23,9 @@ using namespace smu_com_backend;
 // software serial
 SoftwareSerial softSerial(9, 10); // RX, TX
 
-///////////////////////
-// class construcots //
-///////////////////////
+////////////////////////
+// class constructors //
+////////////////////////
 
 /**
  * @brief Default Constructor of the Message class.
@@ -41,9 +41,9 @@ Message::Message() {
 }
 
 /**
- * @brief Empty Message Construcotr.
+ * @brief Empty message constructors.
  * 
- * @param The message type of the message.
+ * @param msgType The message type of the message.
  */
 Message::Message(MessageType msgType) {
     _MsgType = msgType;
@@ -165,7 +165,7 @@ uint8_t Message::getPayloadSize() {
 }
 
 /**
- * @brief Get the totla size of a message.
+ * @brief Get the total size of a message.
  * 
  * @return The total size of the message in bytes as uint8_t.
  */
@@ -223,7 +223,7 @@ void Message::_setPayloadZero() {
  * @param payloadSize The size of the payload in bytes. 
  * @param payload Pointer to an array with up to 25 bytes of payload.
  * 
- * @return The caluculated checksum as uint8_t.
+ * @return The calculated checksum as uint8_t.
  */
 uint8_t smu_com_backend::genCheckSum(MessageType msgType, uint8_t payloadSize, uint8_t payload[25]) {
     // calc actual checksum
@@ -266,7 +266,7 @@ bool smu_com_backend::checkChecksum(Message* msg) {
 }
 
 /**
- * @brief Check is the claculated checksum and a other checksum are equal.
+ * @brief Check is the calculated checksum and a other checksum are equal.
  * 
  * @param msg Pointer to a message as Message*.
  * @param checksum A given checksum as uint8_t.
@@ -310,8 +310,8 @@ void smu_com_backend::sendMessage(Message* msg) {
 	// init serial-com
 	_SMU_COM_BACKEND_SERIAL_INTERFACE.begin(_SMU_COM_BACKEND_BAUD_RATE);
 	
-    // write preambel
-    _SMU_COM_BACKEND_SERIAL_INTERFACE.write(_SMU_COM_BACKEND_PREAMBEL_SING);
+    // write preamble
+    _SMU_COM_BACKEND_SERIAL_INTERFACE.write(_SMU_COM_BACKEND_PREAMBLE_SING);
 
     // write message type 
     _SMU_COM_BACKEND_SERIAL_INTERFACE.write(msg->getMsgType());
@@ -350,7 +350,7 @@ bool smu_com_backend::readNextMessage(Message* msg) {
 	// init serial-com
 	_SMU_COM_BACKEND_SERIAL_INTERFACE.begin(_SMU_COM_BACKEND_BAUD_RATE);
 	
-    // check if enought bytes have been received
+    // check if enough bytes have been received
     if (_SMU_COM_BACKEND_SERIAL_INTERFACE.available() < 5) {
         msg->setMsgType(MessageType::NONE);
         lastComErrorInfo = ComErrorInfo::NO_COM_ERROR;
@@ -360,7 +360,7 @@ bool smu_com_backend::readNextMessage(Message* msg) {
     // timeout stuff
     tempForTime = millis();
 
-    // find preambel
+    // find preamble
     while (true) {
         // check timeout & availability
         if (_SMU_COM_BACKEND_SERIAL_INTERFACE.available() <= 0 || tempForTime + serialComTimeout < millis()) {
@@ -375,13 +375,13 @@ bool smu_com_backend::readNextMessage(Message* msg) {
         }
         
         // read byte & check 
-        if(_SMU_COM_BACKEND_SERIAL_INTERFACE.read() == _SMU_COM_BACKEND_PREAMBEL_SING) {
+        if(_SMU_COM_BACKEND_SERIAL_INTERFACE.read() == _SMU_COM_BACKEND_PREAMBLE_SING) {
             break;
         }
     }
 
     // read message type
-    if (_SMU_COM_BACKEND_SERIAL_INTERFACE.available() < _SMU_COM_BACKEND_MIN_MSG_LENGHT) {  // 4 or more bytes available.
+    if (_SMU_COM_BACKEND_SERIAL_INTERFACE.available() < _SMU_COM_BACKEND_MIN_MSG_LENGTH) {  // 4 or more bytes available.
         uint8_t p[2] = {0};
         msg->setMsgType(MessageType::ERROR);
         p[0] = static_cast<uint8_t>(MessageType::NONE);
@@ -447,9 +447,9 @@ bool smu_com_backend::readNextMessage(Message* msg) {
                     uint8_t p[2] = {0};
                     msg->setMsgType(MessageType::ERROR);
                     p[0] = static_cast<uint8_t>(t);
-                    p[1] = static_cast<uint8_t>(ComErrorInfo::NO_END_SING);
+                    p[1] = static_cast<uint8_t>(ComErrorInfo::INV_PAYLOAD_SIZE);
                     msg->setPayload(p, 2);
-                    lastComErrorInfo = ComErrorInfo::NO_END_SING;
+                    lastComErrorInfo = ComErrorInfo::INV_PAYLOAD_SIZE;
                     return false;
                 }
             }

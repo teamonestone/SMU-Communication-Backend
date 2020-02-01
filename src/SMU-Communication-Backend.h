@@ -31,11 +31,11 @@ extern SoftwareSerial softSerial;
 // Defines //
 /////////////
 
-#define _SMU_COM_BACKEND_PREAMBEL_SING '~'
+#define _SMU_COM_BACKEND_PREAMBLE_SING '~'
 #define _SMU_COM_BACKEND_END_SING '#'
 #define _SMU_COM_BACKEND_MAX_PAYLOAD_SIZE 25
 #define _SMU_COM_BACKEND_TOTAL_SIZE_OFFSET 3
-#define _SMU_COM_BACKEND_MIN_MSG_LENGHT 4
+#define _SMU_COM_BACKEND_MIN_MSG_LENGTH 4
 #define _SMU_COM_BACKEND_BAUD_RATE 115200
 
 // default serial interface
@@ -110,7 +110,7 @@ namespace smu_com_backend
 		
 		NO_START_SIGN = 0x01,
 		NO_END_SING = 0x02,
-		INV_PAYL_SIZE = 0x03,
+		INV_PAYLOAD_SIZE = 0x03,
 		INV_CHECKSUM = 0x04,
 		NOT_ENOUGH_DATA = 0x05,
 		REC_TIMEOUT = 0x06
