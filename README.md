@@ -46,9 +46,9 @@ All serial messages used to controll the SMU board follow the following format:
 | `ACK_FAULT`     | no      | -                     | -                                                                         | -                    |
 | `ACK`           | no      | -                     | -                                                                         | -                    |
 | `PONG`          | yes     | `ACK`                 | `PONG` + 8-bit random value from request                                  | 1 + 1 = 2            |
-| `G_STATUS`      | yes     | `ACK`                 | `G_STATUS` +  8-bit status code                                           | 1 + 1 = 2            |
-| `G_COM_ERROR`   | yes     | `ACK`                 | `G_COM_ERROR` + 8-bit communication error code                            | 1 + 1 = 2            |
-| `G_SMU_ERROR`   | yes     | `ACK`                 | `G_SMU_ERROR` + 8-bit SMU error code                                      | 1 + 1 = 2            |
+| `G_STATUS`      | yes     | `ACK`                 | `G_STATUS` +  16-bit status code                                          | 1 + 2 = 3            |
+| `G_COM_ERROR`   | yes     | `ACK`                 | `G_COM_ERROR` + 16-bit communication error code                           | 1 + 2 = 3            |
+| `G_SMU_ERROR`   | yes     | `ACK`                 | `G_SMU_ERROR` + 16-bit SMU error code                                     | 1 + 2 = 3            |
 | `RESET`         | yes     | `ACK`                 | `RESET`                                                                   | 1                    |
 | `FIRMWARE_V`    | yes     | `ACK`                 | `FIRMWARE_V` + 16-bit version                                             | 1 + 1 = 2            |
 | `COM_BACK_V`    | yes     | `ACK`                 | `COM_BACK_V` + 16-bit version                                             | 1 + 1 = 2            |
