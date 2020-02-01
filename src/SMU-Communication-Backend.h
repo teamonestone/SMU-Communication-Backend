@@ -19,7 +19,7 @@
 //////////////
 
 // basic Includes
-#include "Arduino.h"
+#include <Arduino.h>
 #include <inttypes.h>
 
 // software serial
@@ -37,7 +37,18 @@ extern SoftwareSerial softSerial;
 #define _SMU_COM_BACKEND_TOTAL_SIZE_OFFSET 3
 #define _SMU_COM_BACKEND_MIN_MSG_LENGHT 4
 #define _SMU_COM_BACKEND_BAUD_RATE 115200
+
+// default serial interface
 #define _SMU_COM_BACKEND_SERIAL_INTERFACE softSerial
+
+// serial interface when used in SMU Firmware
+#ifdef SMU_FIRMWARE
+	#define _SMU_COM_BACKEND_SERIAL_INTERFACE softSerial
+#endif
+// serial interface when used in the SMU Library
+#ifdef SMU_LIB
+	#define _SMU_COM_BACKEND_SERIAL_INTERFACE Serial3
+#endif
 
 
 /////////////
