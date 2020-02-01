@@ -381,7 +381,7 @@ bool smu_com_backend::readNextMessage(Message* msg) {
     }
 
     // read message type
-    if (_SMU_COM_BACKEND_SERIAL_INTERFACE.available() <= _SMU_COM_BACKEND_MIN_MSG_LENGHT) {  // 4 or more bytes available.
+    if (_SMU_COM_BACKEND_SERIAL_INTERFACE.available() < _SMU_COM_BACKEND_MIN_MSG_LENGHT) {  // 4 or more bytes available.
         uint8_t p[2] = {0};
         msg->setMsgType(MessageType::ERROR);
         p[0] = static_cast<uint8_t>(MessageType::NONE);
