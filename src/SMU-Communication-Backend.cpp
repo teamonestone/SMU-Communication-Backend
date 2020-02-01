@@ -428,6 +428,7 @@ bool smu_com_backend::readNextMessage(Message* msg) {
                 if (b ==  _SMU_COM_BACKEND_END_SING) {
                     // check checksum
                     if (checkChecksum(msg)) {
+                        lastComErrorInfo = ComErrorInfo::NO_COM_ERROR;
                         return true;
                     }
                     else {
